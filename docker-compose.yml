@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: ./docker/php
+    container_name: laravel_app
+    volumes:
+      - ./application:/var/www/html
+    working_dir: /var/www/html
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - db
+    tty: true
+
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: always
