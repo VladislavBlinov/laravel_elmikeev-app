@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Stock;
+use App\Services\ApiFetcher;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
 
 class FetchStocks extends Command
 {
@@ -13,7 +13,7 @@ class FetchStocks extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch-stocks {dateFrom}';
+    protected $signature = 'fetch:stocks';
 
     /**
      * The console command description.
@@ -25,71 +25,20 @@ class FetchStocks extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(ApiFetcher $fetcher)
     {
-        $dateFrom = $this->argument('dateFrom');
-        $apiUrl = config('api.base_url') . '/stocks';
-
-        $page = 1;
-        $limit = 500;
-
         try
         {
-            while (true)
-            {
-                $response = Http::retry(3, 2000)
-                    ->get($apiUrl, [
-                        'dateFrom' => $dateFrom,
-                        'page' => $page,
-                        'limit' => $limit,
-                        'key' => config('api.api_key')
-                    ])
-                ;
-
-                if ($response->failed())
-                {
-                    $this->error('Статус ошибки: ' . $response->status());
-                    break;
-                }
-
-                $data = $response->json();
-                $this->info(json_encode($data['data']));
-                if (empty($data['data']))
-                {
-                    break;
-                }
-
-                $rows = [];
-                foreach ($data['data'] as $item)
-                {
-                    $rows[] = [
-                        'date' => $item['date'] ?? null,
-                        'last_change_date' => $item['last_change_date'] ?? null,
-                        'supplier_article' => $item['supplier_article'] ?? null,
-                        'tech_size' => $item['tech_size'] ?? null,
-                        'barcode' => $item['barcode'] ?? null,
-                        'quantity' => $item['quantity'] ?? null,
-                        'is_supply' => $item['is_supply'] ?? null,
-                        'is_realization' => $item['is_realization'] ?? null,
-                        'quantity_full' => $item['quantity_full'] ?? null,
-                        'warehouse_name' => $item['warehouse_name'] ?? null,
-                        'in_way_to_client' => $item['in_way_to_client'] ?? null,
-                        'in_way_from_client' => $item['in_way_from_client'] ?? null,
-                        'nm_id' => $item['nm_id'] ?? null,
-                        'subject' => $item['subject'] ?? null,
-                        'category' => $item['category'] ?? null,
-                        'brand' => $item['brand'] ?? null,
-                        'sc_code' => $item['sc_code'] ?? null,
-                        'price' => $item['price'] ?? null,
-                        'discount' => $item['discount'] ?? null,
-                    ];
-                }
-
-                Stock::upsert($rows, [
+            $fetcher->fetchAndSave(
+                'stocks',
+                ['dateFrom' => date('Y-m-d')],
+                Stock::class,
+                [
                     'date',
                     'nm_id',
                     'barcode',
-                ], [
+                ],
+                [
                     'last_change_date',
                     'supplier_article',
                     'tech_size',
@@ -106,16 +55,34 @@ class FetchStocks extends Command
                     'sc_code',
                     'price',
                     'discount',
-                ]);
-
-                $page++;
-                sleep(1);
-            }
+                ],
+                fn($item) => [
+                    'date' => $item['date'] ?? null,
+                    'last_change_date' => $item['last_change_date'] ?? null,
+                    'supplier_article' => $item['supplier_article'] ?? null,
+                    'tech_size' => $item['tech_size'] ?? null,
+                    'barcode' => $item['barcode'] ?? null,
+                    'quantity' => $item['quantity'] ?? null,
+                    'is_supply' => $item['is_supply'] ?? null,
+                    'is_realization' => $item['is_realization'] ?? null,
+                    'quantity_full' => $item['quantity_full'] ?? null,
+                    'warehouse_name' => $item['warehouse_name'] ?? null,
+                    'in_way_to_client' => $item['in_way_to_client'] ?? null,
+                    'in_way_from_client' => $item['in_way_from_client'] ?? null,
+                    'nm_id' => $item['nm_id'] ?? null,
+                    'subject' => $item['subject'] ?? null,
+                    'category' => $item['category'] ?? null,
+                    'brand' => $item['brand'] ?? null,
+                    'sc_code' => $item['sc_code'] ?? null,
+                    'price' => $item['price'] ?? null,
+                    'discount' => $item['discount'] ?? null,
+                ]
+            );
+            $this->info('stocks загружен!');
         }
-
-        catch (\Exception $e)
+        catch (\Exception $exception)
         {
-            $this->error($e->getMessage());
+            $this->error($exception->getMessage());
         }
     }
 }

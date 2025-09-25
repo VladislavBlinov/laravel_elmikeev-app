@@ -30,4 +30,22 @@ class Income extends Model
         'quantity' => 'integer',
         'nm_id' => 'integer',
     ];
+
+    public static function prepareData(array $item): array
+    {
+        return [
+            'income_id' => $item['income_id'] ?? null,
+            'number' => $item['number'] ?? null,
+            'date' => $item['date'] ?? null,
+            'last_change_date' => $item['last_change_date'] ?? null,
+            'supplier_article' => $item['supplier_article'] ?? null,
+            'tech_size' => $item['tech_size'] ?? null,
+            'barcode' => $item['barcode'] ?? null,
+            'quantity' => $item['quantity'] ?? null,
+            'total_price' => $item['total_price'] ?? null,
+            'date_close' => $item['date_close'] ?? null,
+            'warehouse_name' => $item['warehouse_name'] ?? null,
+            'nm_id' => $item['nm_id'] ?? null,
+        ];
+    }
 }
