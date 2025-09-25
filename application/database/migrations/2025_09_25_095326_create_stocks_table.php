@@ -11,45 +11,36 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales', function(Blueprint $table)
+        Schema::create('stocks', function(Blueprint $table)
         {
             $table->id();
-            $table->string('g_number')->nullable();
             $table->date('date')->index();
             $table->date('last_change_date')->nullable();
             $table->string('supplier_article')->nullable();
             $table->string('tech_size')->nullable();
-            $table->bigInteger('barcode')->nullable()->index();
-            $table->string('total_price')->nullable();
-            $table->integer('discount_percent')->nullable();
+            $table->bigInteger('barcode')->integer();
+            $table->integer('quantity')->nullable();
             $table->boolean('is_supply')->nullable();
             $table->boolean('is_realization')->nullable();
-            $table->string('promo_code_discount')->nullable();
+            $table->integer('quantity_full')->nullable();
             $table->string('warehouse_name')->nullable()->index();
-            $table->string('country_name')->nullable();
-            $table->string('oblast_okrug_name')->nullable();
-            $table->string('region_name')->nullable();
-            $table->bigInteger('income_id')->nullable();
-            $table->string('sale_id')->index();
-            $table->string('odid')->nullable();
-            $table->string('spp')->nullable();
-            $table->string('for_pay')->nullable();
-            $table->string('finished_price')->nullable();
-            $table->string('price_with_disc')->nullable();
+            $table->integer('in_way_to_client')->nullable();
+            $table->integer('in_way_from_client')->nullable();
             $table->bigInteger('nm_id')->index();
             $table->string('subject')->nullable();
             $table->string('category')->nullable();
             $table->string('brand')->nullable();
-            $table->boolean('is_storno')->nullable();
+            $table->bigInteger('sc_code')->nullable();
+            $table->string('price')->nullable();
+            $table->string('discount')->nullable();
             $table->timestamps();
 
             $table->unique([
+                'barcode',
                 'date',
-                'sale_id',
                 'nm_id'
             ]);
         });
-
     }
 
     /**
@@ -57,6 +48,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales');
+        Schema::dropIfExists('stocks');
     }
 };

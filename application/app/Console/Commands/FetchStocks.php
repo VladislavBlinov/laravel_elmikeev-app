@@ -2,25 +2,25 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Sale;
+use App\Models\Stock;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-class FetchSales extends Command
+class FetchStocks extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fetch-sales {dateFrom} {dateTo}';
+    protected $signature = 'fetch-stocks {dateFrom}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Импорт sales из API';
+    protected $description = 'Импорт stocks из API';
 
     /**
      * Execute the console command.
@@ -28,8 +28,7 @@ class FetchSales extends Command
     public function handle()
     {
         $dateFrom = $this->argument('dateFrom');
-        $dateTo = $this->argument('dateTo');
-        $apiUrl = config('api.base_url') . '/sales';
+        $apiUrl = config('api.base_url') . '/stocks';
 
         $page = 1;
         $limit = 500;
@@ -41,7 +40,6 @@ class FetchSales extends Command
                 $response = Http::retry(3, 2000)
                     ->get($apiUrl, [
                         'dateFrom' => $dateFrom,
-                        'dateTo' => $dateTo,
                         'page' => $page,
                         'limit' => $limit,
                         'key' => config('api.api_key')
@@ -65,66 +63,49 @@ class FetchSales extends Command
                 foreach ($data['data'] as $item)
                 {
                     $rows[] = [
-                        'g_number' => $item['g_number'] ?? null,
                         'date' => $item['date'] ?? null,
                         'last_change_date' => $item['last_change_date'] ?? null,
                         'supplier_article' => $item['supplier_article'] ?? null,
                         'tech_size' => $item['tech_size'] ?? null,
                         'barcode' => $item['barcode'] ?? null,
-                        'total_price' => $item['total_price'] ?? null,
-                        'discount_percent' => $item['discount_percent'] ?? null,
+                        'quantity' => $item['quantity'] ?? null,
                         'is_supply' => $item['is_supply'] ?? null,
                         'is_realization' => $item['is_realization'] ?? null,
-                        'promo_code_discount' => $item['promo_code_discount'] ?? null,
+                        'quantity_full' => $item['quantity_full'] ?? null,
                         'warehouse_name' => $item['warehouse_name'] ?? null,
-                        'country_name' => $item['country_name'] ?? null,
-                        'oblast_okrug_name' => $item['oblast_okrug_name'] ?? null,
-                        'region_name' => $item['region_name'] ?? null,
-                        'income_id' => $item['income_id'] ?? null,
-                        'sale_id' => $item['sale_id'] ?? null,
-                        'odid' => $item['odid'] ?? null,
-                        'spp' => $item['spp'] ?? null,
-                        'for_pay' => $item['for_pay'] ?? null,
-                        'finished_price' => $item['finished_price'] ?? null,
-                        'price_with_disc' => $item['price_with_disc'] ?? null,
+                        'in_way_to_client' => $item['in_way_to_client'] ?? null,
+                        'in_way_from_client' => $item['in_way_from_client'] ?? null,
                         'nm_id' => $item['nm_id'] ?? null,
                         'subject' => $item['subject'] ?? null,
                         'category' => $item['category'] ?? null,
                         'brand' => $item['brand'] ?? null,
-                        'is_storno' => $item['is_storno'] ?? null,
+                        'sc_code' => $item['sc_code'] ?? null,
+                        'price' => $item['price'] ?? null,
+                        'discount' => $item['discount'] ?? null,
                     ];
                 }
 
-                Sale::upsert($rows, [
-                    'sale_id',
+                Stock::upsert($rows, [
+                    'date',
                     'nm_id',
-                    'date'
+                    'barcode',
                 ], [
-                    'g_number',
                     'last_change_date',
                     'supplier_article',
                     'tech_size',
-                    'barcode',
-                    'total_price',
-                    'discount_percent',
+                    'quantity',
                     'is_supply',
                     'is_realization',
-                    'promo_code_discount',
+                    'quantity_full',
                     'warehouse_name',
-                    'country_name',
-                    'oblast_okrug_name',
-                    'region_name',
-                    'income_id',
-                    'odid',
-                    'spp',
-                    'for_pay',
-                    'finished_price',
-                    'price_with_disc',
+                    'in_way_to_client',
+                    'in_way_from_client',
                     'subject',
                     'category',
                     'brand',
-                    'is_storno',
-                    'updated_at',
+                    'sc_code',
+                    'price',
+                    'discount',
                 ]);
 
                 $page++;

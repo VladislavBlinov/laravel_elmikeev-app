@@ -2,25 +2,25 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Sale;
+use App\Models\Order;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-class FetchSales extends Command
+class FetchOrders extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fetch-sales {dateFrom} {dateTo}';
+    protected $signature = 'fetch-orders {dateFrom} {dateTo}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Импорт sales из API';
+    protected $description = 'Импорт orders из API';
 
     /**
      * Execute the console command.
@@ -29,7 +29,7 @@ class FetchSales extends Command
     {
         $dateFrom = $this->argument('dateFrom');
         $dateTo = $this->argument('dateTo');
-        $apiUrl = config('api.base_url') . '/sales';
+        $apiUrl = config('api.base_url') . '/orders';
 
         $page = 1;
         $limit = 500;
@@ -73,57 +73,39 @@ class FetchSales extends Command
                         'barcode' => $item['barcode'] ?? null,
                         'total_price' => $item['total_price'] ?? null,
                         'discount_percent' => $item['discount_percent'] ?? null,
-                        'is_supply' => $item['is_supply'] ?? null,
-                        'is_realization' => $item['is_realization'] ?? null,
-                        'promo_code_discount' => $item['promo_code_discount'] ?? null,
                         'warehouse_name' => $item['warehouse_name'] ?? null,
-                        'country_name' => $item['country_name'] ?? null,
-                        'oblast_okrug_name' => $item['oblast_okrug_name'] ?? null,
-                        'region_name' => $item['region_name'] ?? null,
+                        'oblast' => $item['oblast'] ?? null,
                         'income_id' => $item['income_id'] ?? null,
-                        'sale_id' => $item['sale_id'] ?? null,
                         'odid' => $item['odid'] ?? null,
-                        'spp' => $item['spp'] ?? null,
-                        'for_pay' => $item['for_pay'] ?? null,
-                        'finished_price' => $item['finished_price'] ?? null,
-                        'price_with_disc' => $item['price_with_disc'] ?? null,
                         'nm_id' => $item['nm_id'] ?? null,
                         'subject' => $item['subject'] ?? null,
                         'category' => $item['category'] ?? null,
                         'brand' => $item['brand'] ?? null,
-                        'is_storno' => $item['is_storno'] ?? null,
+                        'is_cancel' => $item['is_cancel'] ?? false,
+                        'cancel_dt' => $item['cancel_dt'] ?? null,
                     ];
                 }
 
-                Sale::upsert($rows, [
-                    'sale_id',
+                Order::upsert($rows, [
+                    'g_number',
                     'nm_id',
                     'date'
                 ], [
-                    'g_number',
                     'last_change_date',
                     'supplier_article',
                     'tech_size',
                     'barcode',
                     'total_price',
                     'discount_percent',
-                    'is_supply',
-                    'is_realization',
-                    'promo_code_discount',
                     'warehouse_name',
-                    'country_name',
-                    'oblast_okrug_name',
-                    'region_name',
+                    'oblast',
                     'income_id',
                     'odid',
-                    'spp',
-                    'for_pay',
-                    'finished_price',
-                    'price_with_disc',
                     'subject',
                     'category',
                     'brand',
-                    'is_storno',
+                    'is_cancel',
+                    'cancel_dt',
                     'updated_at',
                 ]);
 

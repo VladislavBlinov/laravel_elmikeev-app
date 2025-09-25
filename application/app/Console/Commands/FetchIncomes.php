@@ -2,25 +2,25 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Sale;
+use App\Models\Income;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-class FetchSales extends Command
+class FetchIncomes extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fetch-sales {dateFrom} {dateTo}';
+    protected $signature = 'fetch-incomes {dateFrom} {dateTo}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Импорт sales из API';
+    protected $description = 'Импорт incomes из API';
 
     /**
      * Execute the console command.
@@ -29,7 +29,7 @@ class FetchSales extends Command
     {
         $dateFrom = $this->argument('dateFrom');
         $dateTo = $this->argument('dateTo');
-        $apiUrl = config('api.base_url') . '/sales';
+        $apiUrl = config('api.base_url') . '/incomes';
 
         $page = 1;
         $limit = 500;
@@ -65,66 +65,35 @@ class FetchSales extends Command
                 foreach ($data['data'] as $item)
                 {
                     $rows[] = [
-                        'g_number' => $item['g_number'] ?? null,
+                        'income_id' => $item['income_id'] ?? null,
+                        'number' => $item['number'] ?? null,
                         'date' => $item['date'] ?? null,
                         'last_change_date' => $item['last_change_date'] ?? null,
                         'supplier_article' => $item['supplier_article'] ?? null,
                         'tech_size' => $item['tech_size'] ?? null,
                         'barcode' => $item['barcode'] ?? null,
+                        'quantity' => $item['quantity'] ?? null,
                         'total_price' => $item['total_price'] ?? null,
-                        'discount_percent' => $item['discount_percent'] ?? null,
-                        'is_supply' => $item['is_supply'] ?? null,
-                        'is_realization' => $item['is_realization'] ?? null,
-                        'promo_code_discount' => $item['promo_code_discount'] ?? null,
+                        'date_close' => $item['date_close'] ?? null,
                         'warehouse_name' => $item['warehouse_name'] ?? null,
-                        'country_name' => $item['country_name'] ?? null,
-                        'oblast_okrug_name' => $item['oblast_okrug_name'] ?? null,
-                        'region_name' => $item['region_name'] ?? null,
-                        'income_id' => $item['income_id'] ?? null,
-                        'sale_id' => $item['sale_id'] ?? null,
-                        'odid' => $item['odid'] ?? null,
-                        'spp' => $item['spp'] ?? null,
-                        'for_pay' => $item['for_pay'] ?? null,
-                        'finished_price' => $item['finished_price'] ?? null,
-                        'price_with_disc' => $item['price_with_disc'] ?? null,
                         'nm_id' => $item['nm_id'] ?? null,
-                        'subject' => $item['subject'] ?? null,
-                        'category' => $item['category'] ?? null,
-                        'brand' => $item['brand'] ?? null,
-                        'is_storno' => $item['is_storno'] ?? null,
                     ];
                 }
 
-                Sale::upsert($rows, [
-                    'sale_id',
+                Income::upsert($rows, [
+                    'income_id',
                     'nm_id',
-                    'date'
+                    'date',
                 ], [
-                    'g_number',
+                    'number',
                     'last_change_date',
                     'supplier_article',
                     'tech_size',
                     'barcode',
+                    'quantity',
                     'total_price',
-                    'discount_percent',
-                    'is_supply',
-                    'is_realization',
-                    'promo_code_discount',
+                    'date_close',
                     'warehouse_name',
-                    'country_name',
-                    'oblast_okrug_name',
-                    'region_name',
-                    'income_id',
-                    'odid',
-                    'spp',
-                    'for_pay',
-                    'finished_price',
-                    'price_with_disc',
-                    'subject',
-                    'category',
-                    'brand',
-                    'is_storno',
-                    'updated_at',
                 ]);
 
                 $page++;

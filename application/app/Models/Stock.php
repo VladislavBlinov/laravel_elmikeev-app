@@ -4,47 +4,41 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Sale extends Model
+class Stock extends Model
 {
     protected $fillable = [
-        'g_number',
         'date',
         'last_change_date',
         'supplier_article',
         'tech_size',
         'barcode',
-        'total_price',
-        'discount_percent',
+        'quantity',
         'is_supply',
         'is_realization',
-        'promo_code_discount',
+        'quantity_full',
         'warehouse_name',
-        'country_name',
-        'oblast_okrug_name',
-        'region_name',
-        'income_id',
-        'sale_id',
-        'odid',
-        'spp',
-        'for_pay',
-        'finished_price',
-        'price_with_disc',
+        'in_way_to_client',
+        'in_way_from_client',
         'nm_id',
         'subject',
         'category',
         'brand',
-        'is_storno'
+        'sc_code',
+        'price',
+        'discount',
     ];
 
     protected $casts = [
         'date' => 'date',
         'last_change_date' => 'date',
         'barcode' => 'integer',
-        'income_id' => 'integer',
-        'nm_id' => 'integer',
-        'discount_percent' => 'integer',
+        'quantity' => 'integer',
         'is_supply' => 'boolean',
         'is_realization' => 'boolean',
-        'is_storno' => 'boolean',
+        'quantity_full' => 'integer',
+        'in_way_to_client' => 'integer',
+        'in_way_from_client' => 'integer',
+        'nm_id' => 'integer',
+        'sc_code' => 'integer',
     ];
 }
