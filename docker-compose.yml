@@ -8,33 +8,33 @@ services:
     working_dir: /var/www/html
     environment:
       DB_CONNECTION: mysql
-      DB_HOST: db
+      DB_HOST: ${DB_HOST}
       DB_PORT: 3306
       DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       PHP_MEMORY_LIMIT: 512M
-    depends_on:
-      - db
+    #    depends_on:
+    #      - db
     tty: true
 
-  db:
-    image: mysql:8.0
-    container_name: laravel_db
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-      - --default-authentication-plugin=mysql_native_password
-    restart: always
-    volumes:
-      - db_data:/var/lib/mysql
-
-volumes:
-  db_data:
+#  db:
+#    image: mysql:8.0
+#    container_name: laravel_db
+#    ports:
+#      - "3306:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+#      MYSQL_DATABASE: ${DB_DATABASE}
+#      MYSQL_USER: ${DB_USERNAME}
+#      MYSQL_PASSWORD: ${DB_PASSWORD}
+#    command:
+#      - --character-set-server=utf8mb4
+#      - --collation-server=utf8mb4_unicode_ci
+#      - --default-authentication-plugin=mysql_native_password
+#    restart: always
+#    volumes:
+#      - db_data:/var/lib/mysql
+#
+#volumes:
+#  db_data:
