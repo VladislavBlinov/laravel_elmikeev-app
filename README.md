@@ -24,3 +24,14 @@ php artisan migrate
 ```bash
 php artisan fetch:all 2025-08-01(2000-01-01) 2025-09-01(now)
 ```
+
+---
+
+# Доступ к БД
+
+DB_CONNECTION=mysql
+DB_HOST=db4free.net
+DB_PORT=3306
+DB_DATABASE=laravelelmikeev2
+DB_USERNAME=laravel123
+DB_PASSWORD=laravel123
