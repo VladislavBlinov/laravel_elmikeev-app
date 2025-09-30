@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function(Blueprint $table)
         {
             $table->id();
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->string('g_number');
             $table->dateTime('date')->nullable()->index();
             $table->date('last_change_date');
@@ -37,7 +38,7 @@ return new class extends Migration
             $table->unique([
                 'g_number',
                 'date',
-                'nm_id'
+                'nm_id',
             ]);
         });
     }

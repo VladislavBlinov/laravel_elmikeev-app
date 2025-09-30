@@ -43,7 +43,8 @@ class FetchAll extends Command
                 'dateFrom' => $dateFrom,
                 'dateTo' => $dateTo
             ]);
-            $this->call('fetch:stocks');
+            $this->call('fetch:stocks', [
+            ]);
 
             $this->info('Все данные получены!');
         }

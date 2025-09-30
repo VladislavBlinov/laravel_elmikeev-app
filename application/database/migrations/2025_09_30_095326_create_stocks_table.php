@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('stocks', function(Blueprint $table)
         {
             $table->id();
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->date('date')->index();
             $table->date('last_change_date')->nullable();
             $table->string('supplier_article')->nullable();
@@ -38,7 +39,7 @@ return new class extends Migration
             $table->unique([
                 'barcode',
                 'date',
-                'nm_id'
+                'nm_id',
             ]);
         });
     }
