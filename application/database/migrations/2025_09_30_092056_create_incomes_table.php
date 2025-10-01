@@ -30,6 +30,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique([
+                'account_id',
                 'income_id',
                 'date',
                 'nm_id',

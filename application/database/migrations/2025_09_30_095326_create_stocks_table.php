@@ -37,6 +37,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique([
+                'account_id',
                 'barcode',
                 'date',
                 'nm_id',

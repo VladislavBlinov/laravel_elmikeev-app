@@ -48,9 +48,10 @@ class Sale extends Model
         'is_storno' => 'boolean',
     ];
 
-    public static function prepareData(array $item): array
+    public static function prepareData(array $item, int $accountId): array
     {
         return [
+            'account_id' => $accountId,
             'g_number' => $item['g_number'] ?? null,
             'date' => $item['date'] ?? null,
             'last_change_date' => $item['last_change_date'] ?? null,

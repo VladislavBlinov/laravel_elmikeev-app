@@ -31,9 +31,10 @@ class Income extends Model
         'nm_id' => 'integer',
     ];
 
-    public static function prepareData(array $item): array
+    public static function prepareData(array $item, int $accountId): array
     {
         return [
+            'account_id' => $accountId,
             'income_id' => $item['income_id'] ?? null,
             'number' => $item['number'] ?? null,
             'date' => $item['date'] ?? null,

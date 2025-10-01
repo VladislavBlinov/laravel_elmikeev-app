@@ -19,19 +19,20 @@ docker compose exec app bash
 php artisan migrate
 ```
 
-2. Запустить команду для выгрузки данных:
+2. Создать компанию, аккаунт, сервис, тип токена, токен:
 
 ```bash
-php artisan fetch:all 2025-08-01(2000-01-01) 2025-09-01(now)
+php artisan add:company "Компания 1"
+php artisan add:account 1 "Аккаунт 1"
+php artisan add:service "Service" "https://service.ru"
+php artisan add:tokentype 1 "api-key"
+php artisan add:token 1 1 "api-key" "token"
+
 ```
 
----
+3. Запустить команду для выгрузки данных:
 
-# Доступ к БД
+```bash
+php artisan fetch:all --account-all
+```
 
-DB_CONNECTION=mysql
-DB_HOST=db4free.net
-DB_PORT=3306
-DB_DATABASE=laravelelmikeev2
-DB_USERNAME=laravel123
-DB_PASSWORD=laravel123

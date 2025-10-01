@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\DateRangeHelper;
 use App\Models\Sale;
 use App\Services\ApiFetcher;
 use Illuminate\Console\Command;
@@ -13,7 +14,7 @@ class FetchSales extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:sales {dateFrom} {dateTo}';
+    protected $signature = 'fetch:sales {account_id} {date_from?} {date_to?}';
 
     /**
      * The console command description.
@@ -25,21 +26,35 @@ class FetchSales extends Command
     /**
      * Execute the console command.
      */
+
     public function handle(ApiFetcher $fetcher)
     {
-        $dateFrom = $this->argument('dateFrom');
-        $dateTo = $this->argument('dateTo');
+        $accountId = (int)$this->argument('account_id');
+
+        [
+            $dateFrom,
+            $dateTo
+        ] = DateRangeHelper::resolveDates(
+            Sale::class,
+            $accountId,
+            $this->argument('date_from'),
+            $this->argument('date_to')
+        );
+
+        $this->info("Начинаем загрузку sales");
 
         try
         {
             $fetcher->fetchAndSave(
-                'sales',
+                $accountId,
+                'api/sales',
                 [
                     'dateFrom' => $dateFrom,
                     'dateTo' => $dateTo
                 ],
                 Sale::class,
                 [
+                    'account_id',
                     'sale_id',
                     'nm_id',
                     'date'
@@ -72,6 +87,7 @@ class FetchSales extends Command
                     'updated_at',
                 ],
                 fn($item) => [
+                    'account_id' => $accountId,
                     'g_number' => $item['g_number'] ?? null,
                     'date' => $item['date'] ?? null,
                     'last_change_date' => $item['last_change_date'] ?? null,
@@ -102,10 +118,12 @@ class FetchSales extends Command
                 ]
             );
             $this->info('sales загружен!');
+
+            return 0;
         }
-        catch (\Exception $exception)
+        catch (\Exception $e)
         {
-            $this->error($exception->getMessage());
+            $this->error('Исключение в sales: ' . $e->getMessage());
         }
     }
 }

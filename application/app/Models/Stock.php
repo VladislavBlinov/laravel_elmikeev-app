@@ -42,9 +42,10 @@ class Stock extends Model
         'sc_code' => 'integer',
     ];
 
-    public static function prepareData(array $item): array
+    public static function prepareData(array $item, int $accountId): array
     {
         return [
+            'account_id' => $accountId,
             'date' => $item['date'] ?? null,
             'last_change_date' => $item['last_change_date'] ?? null,
             'supplier_article' => $item['supplier_article'] ?? null,

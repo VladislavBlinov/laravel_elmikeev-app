@@ -13,7 +13,7 @@ class FetchStocks extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:stocks';
+    protected $signature = 'fetch:stocks {account_id}';
 
     /**
      * The console command description.
@@ -25,15 +25,36 @@ class FetchStocks extends Command
     /**
      * Execute the console command.
      */
+
     public function handle(ApiFetcher $fetcher)
     {
+        $accountId = (int)$this->argument('account_id');
+
+        $today = date('Y-m-d');
+
+        $exists = Stock::where('account_id', $accountId)
+            ->whereDate('date', $today)
+            ->exists()
+        ;
+
+        if ($exists)
+        {
+            $this->warn("Данные в stocks на сегодня уже есть, пропускаем");
+
+            return 0;
+        }
+
+        $this->info("Начинаем загрузку stocks");
+
         try
         {
             $fetcher->fetchAndSave(
-                'stocks',
+                $accountId,
+                'api/stocks',
                 ['dateFrom' => date('Y-m-d')],
                 Stock::class,
                 [
+                    'account_id',
                     'date',
                     'nm_id',
                     'barcode',
@@ -57,6 +78,7 @@ class FetchStocks extends Command
                     'discount',
                 ],
                 fn($item) => [
+                    'account_id' => $accountId,
                     'date' => $item['date'] ?? null,
                     'last_change_date' => $item['last_change_date'] ?? null,
                     'supplier_article' => $item['supplier_article'] ?? null,
@@ -79,10 +101,12 @@ class FetchStocks extends Command
                 ]
             );
             $this->info('stocks загружен!');
+
+            return 0;
         }
-        catch (\Exception $exception)
+        catch (\Exception $e)
         {
-            $this->error($exception->getMessage());
+            $this->error('Исключение в stocks: ' . $e->getMessage());
         }
     }
 }

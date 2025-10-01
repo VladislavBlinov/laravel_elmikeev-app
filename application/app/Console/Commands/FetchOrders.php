@@ -13,7 +13,7 @@ class FetchOrders extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:orders {dateFrom} {dateTo}';
+    protected $signature = 'fetch:orders {account_id} {date_from?} {date_to?}';
 
     /**
      * The console command description.
@@ -25,21 +25,31 @@ class FetchOrders extends Command
     /**
      * Execute the console command.
      */
+
     public function handle(ApiFetcher $fetcher)
     {
-        $dateFrom = $this->argument('dateFrom');
-        $dateTo = $this->argument('dateTo');
+        $accountId = (int)$this->argument('account_id');
+
+        $lastDate = Order::where('account_id', $accountId)->max('date');
+        $today = date('Y-m-d');
+        $dateFrom = $this->argument('date_from')
+            ?? ($lastDate && $lastDate<$today ? date('Y-m-d', strtotime($lastDate . ' +1 day')) : $today);
+        $dateTo = $this->argument('date_to') ?? $today;
+
+        $this->info("Начинаем загрузку orders");
 
         try
         {
             $fetcher->fetchAndSave(
-                'orders',
+                $accountId,
+                'api/orders',
                 [
                     'dateFrom' => $dateFrom,
                     'dateTo' => $dateTo
                 ],
                 Order::class,
                 [
+                    'account_id',
                     'g_number',
                     'nm_id',
                     'date'
@@ -63,6 +73,7 @@ class FetchOrders extends Command
                     'updated_at',
                 ],
                 fn($item) => [
+                    'account_id' => $accountId,
                     'g_number' => $item['g_number'] ?? null,
                     'date' => $item['date'] ?? null,
                     'last_change_date' => $item['last_change_date'] ?? null,
@@ -84,10 +95,12 @@ class FetchOrders extends Command
                 ]
             );
             $this->info('orders загружен!');
+
+            return 0;
         }
         catch (\Exception $e)
         {
-            $this->error($e->getMessage());
+            $this->error('Исключение в orders: ' . $e->getMessage());
         }
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sales', function(Blueprint $table)
         {
             $table->id();
-            $table->foreignId('account_id')->default(0);
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->string('g_number')->nullable();
             $table->date('date')->index();
             $table->date('last_change_date')->nullable();
@@ -45,6 +45,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique([
+                'account_id',
                 'date',
                 'sale_id',
                 'nm_id',

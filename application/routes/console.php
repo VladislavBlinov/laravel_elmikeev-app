@@ -9,4 +9,4 @@ Artisan::command('inspire', function()
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('fetch:all')->twiceDaily(9, 21);
+Schedule::command('fetch:all --account-all')->twiceDaily(9, 21);

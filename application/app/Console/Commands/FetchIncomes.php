@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\DateRangeHelper;
 use App\Models\Income;
 use App\Services\ApiFetcher;
 use Illuminate\Console\Command;
@@ -13,7 +14,7 @@ class FetchIncomes extends Command
      *
      * @var string
      */
-    protected $signature = 'fetch:incomes {dateFrom} {dateTo}';
+    protected $signature = 'fetch:incomes {account_id} {date_from?} {date_to?}';
 
     /**
      * The console command description.
@@ -25,21 +26,35 @@ class FetchIncomes extends Command
     /**
      * Execute the console command.
      */
+
     public function handle(ApiFetcher $fetcher)
     {
-        $dateFrom = $this->argument('dateFrom');
-        $dateTo = $this->argument('dateTo');
+        $accountId = (int)$this->argument('account_id');
+
+        [
+            $dateFrom,
+            $dateTo
+        ] = DateRangeHelper::resolveDates(
+            Income::class,
+            $accountId,
+            $this->argument('date_from'),
+            $this->argument('date_to')
+        );
+
+        $this->info("Начинаем загрузку incomes");
 
         try
         {
             $fetcher->fetchAndSave(
-                'incomes',
+                $accountId,
+                'api/incomes',
                 [
                     'dateFrom' => $dateFrom,
                     'dateTo' => $dateTo
                 ],
                 Income::class,
                 [
+                    'account_id',
                     'income_id',
                     'nm_id',
                     'date',
@@ -56,6 +71,7 @@ class FetchIncomes extends Command
                     'warehouse_name',
                 ],
                 fn($item) => [
+                    'account_id' => $accountId,
                     'income_id' => $item['income_id'] ?? null,
                     'number' => $item['number'] ?? null,
                     'date' => $item['date'] ?? null,
@@ -71,10 +87,12 @@ class FetchIncomes extends Command
                 ]
             );
             $this->info('incomes загружен!');
+
+            return 0;
         }
         catch (\Exception $e)
         {
-            $this->error($e->getMessage());
+            $this->error('Исключение в incomes: ' . $e->getMessage());
         }
     }
 }
