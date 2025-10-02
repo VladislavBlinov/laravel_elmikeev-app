@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ApiToken extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'account_id',
         'api_service_id',
@@ -31,5 +34,10 @@ class ApiToken extends Model
     {
         return $this->belongsTo(TokenType::class, 'token_type_id');
 
+    }
+
+    public function serviceTokenType()
+    {
+        return $this->belongsTo(ApiServiceTokenType::class, 'api_service_token_type_id');
     }
 }

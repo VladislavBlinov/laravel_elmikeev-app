@@ -46,6 +46,27 @@ class FetchAll extends Command
         {
             foreach ($accounts as $account)
             {
+                $apiToken = $account->tokens->first();
+
+                if (!$apiToken)
+                {
+                    $this->warn("Токен для аккаунта {$accountId} не найден");
+
+                    continue;
+                }
+
+                $allowed = \App\Models\ApiServiceTokenType::where('api_service_id', $apiToken->api_service_id)
+                    ->where('token_type_id', $apiToken->token_type_id)
+                    ->exists()
+                ;
+
+                if (!$allowed)
+                {
+                    $this->warn("Тип токена {$apiToken->tokenType->name} не разрешен для сервиса {$apiToken->service->name}");
+
+                    continue;
+                }
+
                 $this->info("Обработка аккаунта {$account->name}");
                 $this->call('fetch:sales', [
                     'account_id' => $account->id,
@@ -75,6 +96,8 @@ class FetchAll extends Command
         catch (\Exception $e)
         {
             $this->error($e->getMessage());
+
+            return 1;
         }
     }
 }

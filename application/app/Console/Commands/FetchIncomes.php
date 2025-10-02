@@ -70,21 +70,7 @@ class FetchIncomes extends Command
                     'date_close',
                     'warehouse_name',
                 ],
-                fn($item) => [
-                    'account_id' => $accountId,
-                    'income_id' => $item['income_id'] ?? null,
-                    'number' => $item['number'] ?? null,
-                    'date' => $item['date'] ?? null,
-                    'last_change_date' => $item['last_change_date'] ?? null,
-                    'supplier_article' => $item['supplier_article'] ?? null,
-                    'tech_size' => $item['tech_size'] ?? null,
-                    'barcode' => $item['barcode'] ?? null,
-                    'quantity' => $item['quantity'] ?? null,
-                    'total_price' => $item['total_price'] ?? null,
-                    'date_close' => $item['date_close'] ?? null,
-                    'warehouse_name' => $item['warehouse_name'] ?? null,
-                    'nm_id' => $item['nm_id'] ?? null,
-                ]
+                fn($item) => Income::prepareData($item, $accountId)
             );
             $this->info('incomes загружен!');
 
@@ -93,6 +79,9 @@ class FetchIncomes extends Command
         catch (\Exception $e)
         {
             $this->error('Исключение в incomes: ' . $e->getMessage());
+            $this->error($e->getTraceAsString());
+
+            return 1;
         }
     }
 }

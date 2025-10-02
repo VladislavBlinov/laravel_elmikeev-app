@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ApiService;
 use App\Models\ApiToken;
 use App\Models\TokenType;
 use Illuminate\Console\Command;
@@ -27,6 +28,7 @@ class AddApiToken extends Command
      */
     public function handle()
     {
+        $service = ApiService::findOrFail($this->argument('service_id'));
         $type = $this->argument('token_type');
         $tokenType = TokenType::where('name', $type)->firstOrFail();
 

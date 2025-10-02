@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TokenType extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name'];
 
     public function services(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -16,5 +19,10 @@ class TokenType extends Model
     public function tokens(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ApiToken::class);
+    }
+
+    public function serviceTokenTypes()
+    {
+        return $this->hasMany(ApiServiceTokenType::class, 'token_type_id');
     }
 }

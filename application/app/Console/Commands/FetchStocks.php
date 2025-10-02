@@ -32,18 +32,6 @@ class FetchStocks extends Command
 
         $today = date('Y-m-d');
 
-        $exists = Stock::where('account_id', $accountId)
-            ->whereDate('date', $today)
-            ->exists()
-        ;
-
-        if ($exists)
-        {
-            $this->warn("Данные в stocks на сегодня уже есть, пропускаем");
-
-            return 0;
-        }
-
         $this->info("Начинаем загрузку stocks");
 
         try
@@ -77,28 +65,7 @@ class FetchStocks extends Command
                     'price',
                     'discount',
                 ],
-                fn($item) => [
-                    'account_id' => $accountId,
-                    'date' => $item['date'] ?? null,
-                    'last_change_date' => $item['last_change_date'] ?? null,
-                    'supplier_article' => $item['supplier_article'] ?? null,
-                    'tech_size' => $item['tech_size'] ?? null,
-                    'barcode' => $item['barcode'] ?? null,
-                    'quantity' => $item['quantity'] ?? null,
-                    'is_supply' => $item['is_supply'] ?? null,
-                    'is_realization' => $item['is_realization'] ?? null,
-                    'quantity_full' => $item['quantity_full'] ?? null,
-                    'warehouse_name' => $item['warehouse_name'] ?? null,
-                    'in_way_to_client' => $item['in_way_to_client'] ?? null,
-                    'in_way_from_client' => $item['in_way_from_client'] ?? null,
-                    'nm_id' => $item['nm_id'] ?? null,
-                    'subject' => $item['subject'] ?? null,
-                    'category' => $item['category'] ?? null,
-                    'brand' => $item['brand'] ?? null,
-                    'sc_code' => $item['sc_code'] ?? null,
-                    'price' => $item['price'] ?? null,
-                    'discount' => $item['discount'] ?? null,
-                ]
+                fn($item) => Stock::prepareData($item, $accountId)
             );
             $this->info('stocks загружен!');
 
@@ -107,6 +74,9 @@ class FetchStocks extends Command
         catch (\Exception $e)
         {
             $this->error('Исключение в stocks: ' . $e->getMessage());
+            $this->error($e->getTraceAsString());
+
+            return 1;
         }
     }
 }

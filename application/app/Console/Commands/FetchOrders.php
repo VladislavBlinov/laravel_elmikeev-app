@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\DateRangeHelper;
 use App\Models\Order;
 use App\Services\ApiFetcher;
 use Illuminate\Console\Command;
@@ -30,11 +31,15 @@ class FetchOrders extends Command
     {
         $accountId = (int)$this->argument('account_id');
 
-        $lastDate = Order::where('account_id', $accountId)->max('date');
-        $today = date('Y-m-d');
-        $dateFrom = $this->argument('date_from')
-            ?? ($lastDate && $lastDate<$today ? date('Y-m-d', strtotime($lastDate . ' +1 day')) : $today);
-        $dateTo = $this->argument('date_to') ?? $today;
+        [
+            $dateFrom,
+            $dateTo
+        ] = DateRangeHelper::resolveDates(
+            Order::class,
+            $accountId,
+            $this->argument('date_from'),
+            $this->argument('date_to')
+        );
 
         $this->info("Начинаем загрузку orders");
 
@@ -72,27 +77,7 @@ class FetchOrders extends Command
                     'cancel_dt',
                     'updated_at',
                 ],
-                fn($item) => [
-                    'account_id' => $accountId,
-                    'g_number' => $item['g_number'] ?? null,
-                    'date' => $item['date'] ?? null,
-                    'last_change_date' => $item['last_change_date'] ?? null,
-                    'supplier_article' => $item['supplier_article'] ?? null,
-                    'tech_size' => $item['tech_size'] ?? null,
-                    'barcode' => $item['barcode'] ?? null,
-                    'total_price' => $item['total_price'] ?? null,
-                    'discount_percent' => $item['discount_percent'] ?? null,
-                    'warehouse_name' => $item['warehouse_name'] ?? null,
-                    'oblast' => $item['oblast'] ?? null,
-                    'income_id' => $item['income_id'] ?? null,
-                    'odid' => $item['odid'] ?? null,
-                    'nm_id' => $item['nm_id'] ?? null,
-                    'subject' => $item['subject'] ?? null,
-                    'category' => $item['category'] ?? null,
-                    'brand' => $item['brand'] ?? null,
-                    'is_cancel' => $item['is_cancel'] ?? false,
-                    'cancel_dt' => $item['cancel_dt'] ?? null,
-                ]
+                fn($item) => Order::prepareData($item, $accountId)
             );
             $this->info('orders загружен!');
 
@@ -101,6 +86,9 @@ class FetchOrders extends Command
         catch (\Exception $e)
         {
             $this->error('Исключение в orders: ' . $e->getMessage());
+            $this->error($e->getTraceAsString());
+
+            return 1;
         }
     }
 }
