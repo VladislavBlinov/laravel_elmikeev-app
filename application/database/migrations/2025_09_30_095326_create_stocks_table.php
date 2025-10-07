@@ -15,11 +15,11 @@ return new class extends Migration
         {
             $table->id();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->date('date')->index();
+            $table->date('date');
             $table->date('last_change_date')->nullable();
             $table->string('supplier_article')->nullable();
             $table->string('tech_size')->nullable();
-            $table->bigInteger('barcode')->index();
+            $table->bigInteger('barcode')->nullable()->index();
             $table->integer('quantity')->nullable();
             $table->boolean('is_supply')->nullable();
             $table->boolean('is_realization')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('warehouse_name')->nullable()->index();
             $table->integer('in_way_to_client')->nullable();
             $table->integer('in_way_from_client')->nullable();
-            $table->bigInteger('nm_id')->index();
+            $table->bigInteger('nm_id');
             $table->string('subject')->nullable();
             $table->string('category')->nullable();
             $table->string('brand')->nullable();
@@ -38,7 +38,6 @@ return new class extends Migration
 
             $table->unique([
                 'account_id',
-                'barcode',
                 'date',
                 'nm_id',
             ]);

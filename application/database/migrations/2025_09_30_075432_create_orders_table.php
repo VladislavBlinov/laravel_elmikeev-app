@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->string('g_number');
-            $table->dateTime('date')->nullable()->index();
+            $table->dateTime('date')->nullable();
             $table->date('last_change_date');
             $table->string('supplier_article')->nullable();
             $table->string('tech_size')->nullable();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('oblast')->nullable();
             $table->bigInteger('income_id')->nullable();
             $table->string('odid')->nullable();
-            $table->bigInteger('nm_id')->index();
+            $table->bigInteger('nm_id');
             $table->string('subject')->nullable();
             $table->string('category')->nullable();
             $table->string('brand')->nullable();

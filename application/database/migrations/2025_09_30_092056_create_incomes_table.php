@@ -15,9 +15,9 @@ return new class extends Migration
         {
             $table->id();
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->bigInteger('income_id')->index();
+            $table->bigInteger('income_id');
             $table->string('number')->nullable();
-            $table->date('date')->index();
+            $table->date('date');
             $table->date('last_change_date')->nullable();
             $table->string('supplier_article')->nullable();
             $table->string('tech_size')->nullable();
